@@ -1,0 +1,81 @@
+services:
+    app:
+        build:
+            context: .docker/app
+        container_name: in8_app
+        environment:
+            SERVICE_NAME: in8_app
+            SERVICE_TAGS: php
+        working_dir: /var/www/
+        volumes:
+            - ./backend:/var/www
+            - .docker/app/config/php.ini:/usr/local/etc/php/conf.d/laravel.ini
+            - .docker/app/config/cron/in8:/etc/cron.d/in8
+        networks:
+            - ntw_in8
+        command: php-fpm
+    # frontend application
+    front:
+        build:
+            context: .docker/frontend
+        container_name: in8_frontend
+        environment:
+            SERVICE_NAME: front
+            SERVICE_TAGS: quasar
+        working_dir: /var/www
+        volumes:
+            - ./frontend:/var/www
+        ports:
+            - "8080:8080"
+            - "9090:9090"
+        stdin_open: true
+        tty: true
+        networks:
+            - ntw_in8
+        # webserver
+    webserver:
+        image: nginx:alpine
+        container_name: in8_webserver
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./backend:/var/www
+            - ./.docker/webserver/config/:/etc/nginx/conf.d/
+        networks:
+            - ntw_in8
+
+    mariadb:
+        image: mariadb
+        container_name: in8_mariadb
+        ports:
+            - 3306:3306
+        volumes:
+            - dbdata:/var/lib/mysql/
+            - ./.docker/mysql/config/my.cnf:/etc/mysql/my.cnf
+        environment:
+            - MYSQL_DATABASE=in8
+            - MYSQL_ROOT_PASSWORD=seven
+            - MYSQL_PASSWORD=seven
+            - MYSQL_USER=root
+        networks:
+            - ntw_in8
+
+    redis:
+        image: redis:alpine
+        container_name: in8_redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        networks:
+            - ntw_in8
+# by configuring a network, it helps to build a cloud prod microservice environment
+networks:
+    ntw_in8:
+        driver: bridge
+volumes:
+    dbdata:
+        driver: local
+    redis_data:
+        driver: local
