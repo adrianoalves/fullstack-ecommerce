@@ -8,31 +8,7 @@
 
           </q-card-section>
           <q-card-section>
-            <q-form class="q-px-sm q-pt-sm">
-              <q-input
-                class="q-mb-md"
-                outlined
-                clearable
-                v-model="email"
-                type="email"
-                label="Email">
-                <template v-slot:prepend>
-                  <q-icon name="local_post_office" />
-                </template>
-              </q-input>
-
-              <q-input
-                outlined
-                clearable
-                v-model="passwd"
-                type="password"
-                label="Senha">
-
-                <template v-slot:prepend>
-                  <q-icon name="lock_open" />
-                </template>
-              </q-input>
-            </q-form>
+            <div class="text-amber-7">store front</div>
           </q-card-section>
 
           <q-card-actions class="q-px-lg q-pb-lg">
@@ -54,14 +30,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import {api} from 'boot/axios';
 import { useUserStore } from 'stores/UserStore'
 
 const email = ref('testing@email.com')
 const passwd = ref('123456')
 const userStore = useUserStore()
-const router = useRouter()
 
 const submit = () => {
 
@@ -71,7 +45,6 @@ const submit = () => {
   .then( (res) => {
     userStore.token = res.data.token
     userStore.data  = res.data.user
-    router.push({ name: 'store'})
   })
 }
 

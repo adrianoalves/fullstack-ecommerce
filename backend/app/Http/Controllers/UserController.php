@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use http\Env\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -17,6 +20,9 @@ class UserController extends Controller
             return \response()->json(['message' => 'Usuário ou senha inválidos'], 401);
         }
 
-        return \response()->json(['token' => $user->createToken('device_test_name')->plainTextToken], 201);
+        return \response()->json([
+            'token' => $user->createToken('device_test_name')->plainTextToken,
+            'user' => $user->only(['id', 'name', 'email'])
+        ], 201);
     }
 }
